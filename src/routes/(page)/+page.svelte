@@ -1,46 +1,51 @@
-<script>
-	let inputText = ''; // Bind this to the text box
-  
-	async function sendData() {
-	  const url = 'https://2e9c-35-226-7-46.ngrok-free.app/ask';
-		console.log('Sending data:', inputText); // Log the input text
-	  try {
-		const response = await fetch(url, {
-		  method: 'POST',
-		  headers: {
-			'Content-Type': 'application/json',
-		  },
-		  body: JSON.stringify({ question: inputText }), // Match the API's expected structure
-		});
-  
-		if (response.ok) {
-		  const data = await response.json();
-		  console.log('Response:', data.answer); // Log the API response
-		} else {
-		  console.error('Failed to send data:', response.statusText);
-		}
-	  } catch (error) {
-		console.error('Error:', error);
-	  }
-	}
-  </script>
-  
-  <style>
-	.container {
-	  display: flex;
-	  flex-direction: column;
-	  gap: 10px;
-	  width: 300px;
-	  margin: auto;
-	  margin-top: 50px;
-	}
-  </style>
-  
-  <div class="container">
-	<input
-	  type="text"
-	  bind:value={inputText}
-	  placeholder="Enter your question here"
-	/>
-	<button onclick={sendData}>Send to API</button>
-  </div>
+<script lang="ts">
+  let inputText = $state("");
+  let responsePromise: Promise<string> | null = $state(null);
+
+  async function sendData() {
+    const url = "https://2f4f-35-224-123-54.ngrok-free.app/ask";
+    console.log("Sending data:", JSON.stringify({ question: inputText })); // Log the input text
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json", // Set the Content-Type header
+      },
+      body: JSON.stringify({ question: inputText }), // Convert the body to JSON
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Response:", data.answer);
+      return data.answer;
+    } else {
+      throw new Error(response.statusText);
+    }
+  }
+</script>
+
+<div class="container">
+  <input
+    type="text"
+    bind:value={inputText}
+    placeholder="Enter your question here"
+  />
+  <button onclick={() => (responsePromise = sendData())}>Send to API</button>
+</div>
+{#await responsePromise}
+  <p>Loading...</p>
+{:then response}
+  <p>{response}</p>
+{:catch error}
+  <p>Error: {error.message}</p>
+{/await}
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 300px;
+    margin: auto;
+    margin-top: 50px;
+  }
+</style>
