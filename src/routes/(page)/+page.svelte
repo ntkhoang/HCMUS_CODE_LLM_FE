@@ -13,36 +13,38 @@
 		content: string;
 	};
 
+
 	let messages = $state<Message[]>([]);
 	let isLoading = $state(false);
-
+	let context : string = "";
 	async function sendMessage() {
 		if (!inputText.trim()) {
 			toast.error("Please enter a message");
 			return;
 		}
 		isLoading = true;
+		context+= 'Instruction: '+ inputText + '\nResponse: ' ;
 		messages = [...messages, { type: 'user', content: inputText }];
-		const userMessage = inputText;
-		inputText = "";
 
-		const url = "https://3b9b-34-28-34-3.ngrok-free.app/ask";
+		const url = "https://ae44-34-105-117-107.ngrok-free.app/ask";
 		try {
 			const response = await fetch(url, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({ question: userMessage }),
+				body: JSON.stringify({ question: context}),
 			});
 
 			if (response.ok) {
 				const data = await response.json();
 				messages = [...messages, { type: 'ai', content: data.answer }];
+				context+= data.answer + '\n';
 			} else {
 				throw new Error(response.statusText);
 			}
 		} catch (error) {
+			console.error(error);
 			toast.error("Failed to get response");
 			messages = [...messages, { type: 'error', content: "Failed to get response. Please try again." }];
 		} finally {
@@ -65,7 +67,7 @@
 			<CardContent>
 				{#each messages as message}
 					<div class="mb-4 {message.type === 'user' ? 'text-right' : 'text-left'}">
-						<div class="inline-block max-w-[70%] p-3 rounded-lg {message.type === 'user' ? 'bg-primary text-primary-foreground' : message.type === 'ai' ? 'bg-secondary' : 'bg-destructive text-destructive-foreground'}">
+						<div class="inline-block max-w-[70%] p-3 rounded-lg whitespace-pre-wrap {message.type === 'user' ? 'bg-primary text-primary-foreground' : message.type === 'ai' ? 'bg-secondary' : 'bg-destructive text-destructive-foreground'}">
 							{#if message.type === 'user'}
 								<User class="inline-block mr-2 h-4 w-4" />
 							{:else if message.type === 'ai'}
@@ -99,5 +101,4 @@
 		</Button>
 	</form>
 </div>
-
 <Toaster />
