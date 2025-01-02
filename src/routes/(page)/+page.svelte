@@ -6,12 +6,14 @@
     import { Alert, AlertDescription } from "$lib/components/ui/alert";
     import { CircleAlert, Send, User, Pencil, Check, X } from "lucide-svelte";
     import { Toaster, toast } from "svelte-sonner";
+    import { Trash2 } from "lucide-svelte";
+
 
     let inputText = $state("");
     let editText = $state("");
     let editingIndex = $state<number | null>(null);
 
-	let url = "https://0e83-171-240-154-159.ngrok-free.app/ask"
+	let url = "https://3fd8-34-55-108-86.ngrok-free.app/ask"
 
     type Message = {
         type: 'user' | 'ai' | 'error';
@@ -21,6 +23,16 @@
     let messages = $state<Message[]>([]);
     let isLoading = $state(false);
     let context: string = "";
+
+    function resetChat() {
+        if (messages.length === 0) {
+            toast.error("Chat is already empty");
+            return;
+        }
+        messages = [];
+        context = "";
+        toast.success("Chat history cleared");
+    }
 
     function startEditing(index: number) {
         editingIndex = index;
@@ -127,15 +139,14 @@
     }
 </script>
 
-<div class="flex flex-col h-screen max-w-3xl mx-auto p-4">
+<div class="flex flex-col h-screen w-full max-w-6xl mx-auto p-6 ">
     <h1 class="text-2xl font-bold mb-4">AI Chat Interface</h1>
-
     <Card class="flex-grow mb-4">
-        <ScrollArea class="h-[calc(100vh-200px)]">
-            <CardContent>
+        <ScrollArea class="h-[calc(100vh-220px)]">
+            <CardContent class="p-6 space-y-6">
                 {#each messages as message, index}
                     <div class="mb-4 {message.type === 'user' ? 'text-right' : 'text-left'}">
-                        <div class="inline-block max-w-[70%] p-3 rounded-lg whitespace-pre-wrap relative group
+                        <div class="inline-block max-w-[75%] p-4 rounded-lg whitespace-pre-wrap relative group
                             {message.type === 'user' ? 'bg-primary text-primary-foreground' : 
                              message.type === 'ai' ? 'bg-secondary' : 'bg-destructive text-destructive-foreground'}">
                             
@@ -196,6 +207,16 @@
     </Card>
 
     <form onsubmit={preventDefault(() => sendMessage())} class="flex gap-2">
+        <Button 
+            variant="destructive"
+            size="sm"
+            on:click={resetChat}
+            disabled={isLoading}
+            class="hover:bg-destructive/90"
+        >
+            <Trash2 class="mr-2 h-4 w-4" />
+            Clear Chat
+        </Button>
         <Input 
             type="text" 
             bind:value={inputText} 
