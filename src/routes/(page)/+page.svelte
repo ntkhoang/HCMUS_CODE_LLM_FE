@@ -7,7 +7,15 @@
     import { CircleAlert, Send, User, Pencil, Check, X } from "lucide-svelte";
     import { Toaster, toast } from "svelte-sonner";
     import { Trash2 } from "lucide-svelte";
+    import { Moon, Sun, Settings2 } from "lucide-svelte";
 
+
+    let isDark = $state(false);
+    
+    function toggleTheme() {
+        isDark = !isDark;
+        document.documentElement.classList.toggle('dark');
+    }
 
     let inputText = $state("");
     let editText = $state("");
@@ -140,6 +148,18 @@
 </script>
 
 <div class="flex flex-col h-screen w-full max-w-6xl mx-auto p-6 ">
+    <Button 
+        variant="ghost" 
+        size="icon"
+        on:click={toggleTheme}
+        class="rounded-full hover:bg-accent"
+    >
+        {#if isDark}
+            <Moon class="h-5 w-5" />
+        {:else}
+            <Sun class="h-5 w-5" />
+        {/if}
+    </Button>
     <h1 class="text-2xl font-bold mb-4">AI Chat Interface</h1>
     <Card class="flex-grow mb-4">
         <ScrollArea class="h-[calc(100vh-220px)]">
