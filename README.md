@@ -56,3 +56,6 @@ To publish your library to [npm](https://www.npmjs.com):
 ```bash
 npm publish
 ```
+
+# Demo
+![](https://github.com/ntkhoang/HCMUS_CODE_LLM_FE/blob/main/Untitleddesign-ezgif.com-video-to-gif-converter.gif)
